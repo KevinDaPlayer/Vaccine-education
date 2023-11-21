@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/css/login.css" />
+    <title>登入</title>
+  </head>
+  <body>
+    <div class="container">
+      <h2>疫苗履歷</h2>
+      <form action="http://localhost:3000/login" method="post">
+        <input
+          type="text"
+          id="IdentityCardNumber"
+          name="IdentityCardNumber"
+          placeholder="請輸入身分證字號(十位數)"
+          required
+        />
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="請輸入出生年月日(西元年/月/日)"
+          required
+        />
+        <button type="submit">登入</button>
+      </form>
+    </div>
+    <!-- <script src="login.js"></script> -->
+  </body>
+</html>

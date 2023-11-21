@@ -1,0 +1,30 @@
+h2 {
+  font-size: 60px;
+  text-align: center;
+  margin-top: 200px;
+}
+
+/* 如果需要垂直居中，可以使用以下样式 */
+table {
+  margin: 200px auto;
+  transform: scale(2);
+}
+
+#ageDisplay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* 您可以根據需要調整高度 */
+  text-align: center;
+  color: blue; /* 文字顏色 */
+  font-size: 50px; /* 文字大小 */
+  /* 添加更多您需要的樣式 */
+}
+
+.text-background {
+  background-color: lightgray; /* 文字的背景色 */
+  padding: 5px; /* 添加一些內邊距以增加背景區域的大小 */
+  color: blue; /* 文字顏色 */
+  font-size: 20px; /* 文字大小 */
+  /* 可以添加更多的樣式 */
+}
