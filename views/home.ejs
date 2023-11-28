@@ -1,80 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/css/home.css">
-    <script type="text/javascript" src="https://unpkg.com/pdfjs-dist/build/pdf.js"></script>
-    <script src="https://kit.fontawesome.com/85b5e0a241.js" crossorigin="anonymous"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/css/home.css" />
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/pdfjs-dist/build/pdf.js"
+    ></script>
+    <script
+      src="https://kit.fontawesome.com/85b5e0a241.js"
+      crossorigin="anonymous"
+    ></script>
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <h2>疫苗履歷</h2>
-    <div id="ageDisplay">
-    年齡將在這裡顯示
-    </div>
+    <div id="ageDisplay">年齡將在這裡顯示</div>
     <table border="1">
-        <tr>
-            <td>疫苗種類</td>
-            <td>接種狀態</td>
-            <td>衛教單張</td>
-            <td>測驗連結</td>
-            <td>測驗結果</td>
-        </tr>
-        <tr>
-            <td style="background-color:rgb(89, 224, 89)">A類疫苗</td>
-            <td>超過施打時間（已施打）</td>
-            <td>
-                <a href="/pdf/my elevator.pdf" target="_blank">
-                    <i class="fas fa-file-pdf"></i>
-                </a>
-            </td>
-            <td>
-                <a href="./test/" target="_blank" style="color: gray;">Test</a>
-            </td>
-            <td>0</td>
-           
-        </tr>
-        <tr>
-            <td style="background-color:rgb(27, 125, 216)">B類疫苗</td>
-            <td>一年內需施打</td>
-            <td>
-                <a href="/pdf/my elevator.pdf" target="_blank">
-                    <i class="fas fa-file-pdf"></i>
-                </a>
-            </td>
-            <td><a href="./test/" target="_blank" style="color: gray;">Test</td>
-            <td>0</td>
-        </tr>
-        <tr>
-            <td style="background-color:rgb(207, 53, 53)">C類疫苗</td>
-            <td>時間未到（未來需施打）</td>
-            <td>
-                <a href="/pdf/my elevator.pdf" target="_blank">
-                    <i class="fas fa-file-pdf"></i>
-                </a>
-            </td>
-            <td><a href="./test/" target="_blank" style="color: gray;">Test</td>
-            <td>0</td>
-        </tr>
+      <tr>
+        <td>疫苗種類</td>
+        <td>接種狀態</td>
+        <td>衛教單張</td>
+        <td>測驗連結</td>
+        <td>測驗結果</td>
+      </tr>
+      <tr>
+        <td style="background-color: rgb(89, 224, 89)">A類疫苗</td>
+        <td style="background-color: rgb(255, 255, 255)">
+          <% categories.past.forEach(function(vaccine) { %>
+          <p><%= vaccine.vaccinename %></p>
+          <% }); %>
+        </td>
+        <td>
+          <a href="/pdf/my elevator.pdf" target="_blank">
+            <i class="fas fa-file-pdf"></i>
+          </a>
+        </td>
+        <td>
+          <a href="./test/" target="_blank" style="color: gray">Test</a>
+        </td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td style="background-color: rgb(0, 132, 255)">B類疫苗</td>
+        <td style="background-color: rgb(255, 255, 255)">
+          <% categories.withinYear.forEach(function(vaccine) { %>
+          <p><%= vaccine.vaccinename %></p>
+          <% }); %>
+        </td>
+
+        <td>
+          <a href="/pdf/my elevator.pdf" target="_blank">
+            <i class="fas fa-file-pdf"></i>
+          </a>
+        </td>
+        <td>
+          <a href="./test/" target="_blank" style="color: gray">Test</a>
+        </td>
+        <td>0</td>
+      </tr>
+      <tr>
+        <td style="background-color: rgb(207, 53, 53)">C類疫苗</td>
+        <td style="background-color: rgb(255, 255, 255)">
+          <% categories.future.forEach(function(vaccine) { %>
+          <p><%= vaccine.vaccinename %></p>
+          <% }); %>
+        </td>
+
+        <td>
+          <a href="/pdf/my elevator.pdf" target="_blank">
+            <i class="fas fa-file-pdf"></i>
+          </a>
+        </td>
+        <td><a href="./test/" target="_blank" style="color: gray">Test</a></td>
+        <td>0</td>
+      </tr>
     </table>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-  fetch(`http://localhost:3000/getAge`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("無法獲取年齡數據");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      document.getElementById("ageDisplay").innerText = `您的孩子: ${data.age} 大了`;
-    })
-    .catch((error) => {
-      console.error("錯誤:", error);
-    });
-});
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch(`http://localhost:3000/getAge`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("無法獲取年齡數據");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            document.getElementById(
+              "ageDisplay"
+            ).innerText = `您的孩子: ${data.age} 大了`;
+          })
+          .catch((error) => {
+            console.error("錯誤:", error);
+          });
+      });
     </script>
     <!-- <script src="/js/homepage.js"></script> -->
-</body>
+  </body>
 </html>
