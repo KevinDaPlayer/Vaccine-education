@@ -126,25 +126,32 @@ app.get("/dashboard", (req, res) => {
             future: [],
           };
 
-          vaccines.forEach((vaccine) => {
+          /*vaccines.forEach((vaccine) => {
             const recommendedAgeInMonths = parseVaccinationTime(
               vaccine.VaccinationTime
             );
             const recommendedAgeInYears = recommendedAgeInMonths / 12;
             console.log(age);
-            /*if (age >= recommendedAgeInYears) {
-              if (age + 1 > recommendedAgeInYears) {
-                categories.past.push(vaccine); // 已經過了施打疫苗期間
-              } else {
-                categories.withinYear.push(vaccine); // 未來一年內要施打
-              }
-            } else {
-              categories.future.push(vaccine); // 未來超過一年的
-            }*/
-
+       
             if (age > recommendedAgeInYears) {
               categories.past.push(vaccine); // 已經過了施打疫苗期間
             } else if (age + 1 < recommendedAgeInYears) {
+              categories.future.push(vaccine); // 未來超過一年的
+            } else {
+              categories.withinYear.push(vaccine); // 未來一年內要施打
+            }
+          }); */
+
+          vaccines.forEach((vaccine) => {
+            const { startMonths, endMonths } = parseVaccinationTime(
+              vaccine.VaccinationTime
+            );
+            const startAgeInYears = startMonths / 12;
+            const endAgeInYears = endMonths / 12;
+
+            if (age > endAgeInYears) {
+              categories.past.push(vaccine); // 已經過了施打疫苗期間
+            } else if (age + 1 < startAgeInYears) {
               categories.future.push(vaccine); // 未來超過一年的
             } else {
               categories.withinYear.push(vaccine); // 未來一年內要施打
@@ -242,8 +249,23 @@ app.get("/vaccines", (req, res) => {
 function parseVaccinationTime(vaccinationTime) {
   // 假設 vaccinationTime 是這樣的格式："出生後5個月"
   // 解析這個字符串以獲得月份數
-  const match = vaccinationTime.match(/(\d+)/);
-  return match ? parseInt(match[1]) : 0;
+
+  /*const match = vaccinationTime.match(/(\d+)/);
+  return match ? parseInt(match[1]) : 0;*/
+
+  const matches = vaccinationTime.match(/(\d+)/g);
+  if (matches && matches.length === 2) {
+    // 有兩個數字，表示是一個範圍，例如 "12到15個月"
+    const startMonths = parseInt(matches[0]);
+    const endMonths = parseInt(matches[1]);
+    return { startMonths, endMonths };
+  } else if (matches) {
+    // 只有一個數字，表示是單一時間點
+    const months = parseInt(matches[0]);
+    return { startMonths: months, endMonths: months };
+  }
+
+  return { startMonths: 0, endMonths: 0 };
 }
 
 //

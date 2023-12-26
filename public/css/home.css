@@ -1,13 +1,20 @@
 h2 {
   font-size: 60px;
   text-align: center;
-  margin-top: 200px;
+  margin-top: 50px; /* 調整間距 */
+  margin-bottom: 30px; /* 為標題下方增加一些間距 */
 }
 
 /* 如果需要垂直居中，可以使用以下样式 */
 table {
-  margin: 200px auto;
-  transform: scale(2);
+  width: 100%; /* 表格寬度 */
+  border-collapse: collapse; /* 移除單元格之間的間隙 */
+  margin: 20px 0; /* 表格的上下邊距 */
+  font-size: 1.1em; /* 字體大小 */
+  min-width: 400px; /* 最小寬度 */
+  border-radius: 5px 5px 0 0; /* 上方圓角 */
+  overflow: hidden; /* 隱藏溢出的內容 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15); /* 盒子陰影 */
 }
 
 #ageDisplay {
@@ -18,13 +25,26 @@ table {
   text-align: center;
   color: blue; /* 文字顏色 */
   font-size: 50px; /* 文字大小 */
-  /* 添加更多您需要的樣式 */
+  margin-bottom: 20px; /* 在年齡顯示和表格之間增加一些間距 */
+}
+/* 疫苗表格樣式 */
+table {
+  border-collapse: collapse; /* 移除表格間的空隙 */
 }
 
-.text-background {
-  background-color: lightgray; /* 文字的背景色 */
-  padding: 5px; /* 添加一些內邊距以增加背景區域的大小 */
-  color: blue; /* 文字顏色 */
-  font-size: 20px; /* 文字大小 */
-  /* 可以添加更多的樣式 */
+table,
+th,
+td {
+  border: 1px solid black; /* 給表格和單元格加上邊框 */
+}
+
+th,
+td {
+  padding: 10px; /* 增加單元格的內邊距 */
+  text-align: center; /* 文字居中顯示 */
+}
+
+th {
+  background-color: #4caf50; /* 表頭背景色 */
+  color: white; /* 表頭文字顏色 */
 }
