@@ -16,7 +16,7 @@
   </head>
   <body>
     <h2>疫苗履歷</h2>
-    <div id="ageDisplay">年齡將在這裡顯示</div>
+    <!-- <div id="ageDisplay">年齡將在這裡顯示</div>
     <table border="1">
       <tr>
         <td>疫苗種類</td>
@@ -76,7 +76,44 @@
         <td><a href="./test/" target="_blank" style="color: gray">Test</a></td>
         <td>0</td>
       </tr>
+    </table> -->
+    <div id="ageDisplay">年齡將在這裡顯示</div>
+    <table border="1">
+      <tr>
+        <td>疫苗種類</td>
+        <td>接種狀態</td>
+        <td>衛教單張</td>
+        <td>測驗連結</td>
+        <td>測驗結果</td>
+      </tr>
+      <% ['past', 'withinYear', 'future'].forEach(function(category) { %>
+      <tr>
+        <td
+          style="background-color: <%= category === 'past' ? 'rgb(89, 224, 89)' : (category === 'withinYear' ? 'rgb(0, 132, 255)' : 'rgb(207, 53, 53)') %>"
+        >
+          <%= category === 'past' ? 'A類疫苗' : (category === 'withinYear' ?
+          'B類疫苗' : 'C類疫苗') %>
+        </td>
+        <td>
+          <% categories[category].forEach(function(vaccine) { %>
+          <p><%= vaccine.vaccinename %></p>
+          <% }); %>
+        </td>
+        <td>
+          <% categories[category].forEach(function(vaccine) { %>
+          <a href="/pdf/<%= vaccine.vaccinename %>.pdf" target="_blank">
+            <i class="fas fa-file-pdf"></i> <%= vaccine.vaccinename %>衛教單 </a
+          ><br />
+          <% }); %>
+        </td>
+        <td>
+          <a href="./test/" target="_blank" style="color: gray">Test</a>
+        </td>
+        <td>0</td>
+      </tr>
+      <% }); %>
     </table>
+
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         fetch(`http://localhost:3000/getAge`)
@@ -89,7 +126,7 @@
           .then((data) => {
             document.getElementById(
               "ageDisplay"
-            ).innerText = `您的孩子: ${data.age} 大了`;
+            ).innerText = `您的年齡: ${data.age} `;
           })
           .catch((error) => {
             console.error("錯誤:", error);
