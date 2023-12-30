@@ -9,6 +9,7 @@ app.use(express.static("public"));
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use("/static", express.static(path.join(__dirname, "node_modules")));
 // 創建數據庫連接
 const db = {
   host: "localhost",
@@ -244,6 +245,13 @@ app.get("/vaccines", (req, res) => {
       });
     }
   );
+});
+//登出
+app.get("/logout", (req, res) => {
+  if (req.session) {
+    delete req.session.verificationCode;
+  }
+  res.render("login");
 });
 
 function parseVaccinationTime(vaccinationTime) {
