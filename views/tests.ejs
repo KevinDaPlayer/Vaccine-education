@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="/static/bootstrap/dist/css/bootstrap.min.css"
+    />
+  </head>
+
+  <body>
+    <form action="/submit" method="post">
+      <input
+        type="hidden"
+        name="vaccine_name"
+        value="<%= requestedVaccineName %>"
+      />
+      <ul>
+        <% var counters = {}; %> <% var previousVaccineName = ''; %> <%
+        test.forEach(function(row) { %> <% if (row.vaccine_name ===
+        requestedVaccineName) { %> <% if (previousVaccineName !==
+        row.vaccine_name) { %>
+        <li>
+          <strong><h1><%= row.vaccine_name %>測驗</h1></strong>
+        </li>
+        <% previousVaccineName = row.vaccine_name; %> <% } %> <%
+        counters[row.vaccine_name] = counters[row.vaccine_name] || 1; %> <%=
+        counters[row.vaccine_name]++ %>.<%= row.question %>
+
+        <ul>
+          <% var optionsArray = row.options.split(';'); %> <%
+          optionsArray.forEach(function(option, index) { %>
+          <input
+            type="radio"
+            name="<%= row.id %>+<%= row.vaccine_name %>"
+            value="<%= String.fromCharCode(index + 65) %>"
+          />
+          <%= option.trim() %>
+          <br />
+          <% }); %>
+        </ul>
+        <% }; %> <% }); %>
+      </ul>
+
+      <input type="submit" class="btn btn-secondary mb-2" value="提交答案" />
+    </form>
+    <div class="card">
+      <% if (typeof isPassed !== 'undefined') { %> <% if (isPassed) { %>
+      <p>恭喜！您已通過測驗。</p>
+      <% } else { %>
+      <p>很遺憾，您沒有通過測驗。以下是正確答案：</p>
+      <ul>
+        <% for (let key in correctAnswers) { %>
+        <li>問題 <%= key %> 的正確答案是: <%= correctAnswers[key] %></li>
+        <% } %>
+      </ul>
+      <% } %> <% } %>
+    </div>
+  </body>
+</html>

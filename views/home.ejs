@@ -157,9 +157,24 @@
           <% }); %>
         </td>
         <td>
-          <a href="./test/" target="_blank" style="color: gray">Test</a>
+          <% categories[category].forEach(function(vaccine) { %>
+          <a
+            href="/test/<%= vaccine.vaccinename %>"
+            target="_blank"
+            style="color: gray"
+          >
+            <%= vaccine.vaccinename %>測驗</a
+          ><br />
+          <% }); %>
         </td>
-        <td>0</td>
+        <td>
+          <% categories[category].forEach(function(vaccine) { %> <% if
+          (vaccine.testResult == true) { %> <%= vaccine.vaccinename %>:
+          已通過測驗 <% } else if (vaccine.testResult == false) { %> <%=
+          vaccine.vaccinename %>: 未通過測驗 <% } else { %> <%=
+          vaccine.vaccinename %>: 未進行測驗 <% } %><br />
+          <% }); %>
+        </td>
       </tr>
       <% }); %>
     </table>

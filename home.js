@@ -46,7 +46,7 @@ connection.connect((err) => {
 
 app.post("/login", (req, res) => {
   const { IdentityCardNumber, password } = req.body;
-  console.log(IdentityCardNumber, password);
+  /*console.log(IdentityCardNumber, password);*/
   try {
     const query = "SELECT * FROM patients WHERE IdentityCardNumber = ?";
     connection.query(
@@ -92,8 +92,7 @@ app.post("/login", (req, res) => {
   }
 });*/
 
-// 主畫面路由
-app.get("/dashboard", (req, res) => {
+/*app.get("/dashboard", (req, res) => {
   // 檢查用戶是否已登錄
   if (req.session.isAuthenticated) {
     const identityCardNumber = req.session.identityCardNumber;
@@ -127,22 +126,6 @@ app.get("/dashboard", (req, res) => {
             future: [],
           };
 
-          /*vaccines.forEach((vaccine) => {
-            const recommendedAgeInMonths = parseVaccinationTime(
-              vaccine.VaccinationTime
-            );
-            const recommendedAgeInYears = recommendedAgeInMonths / 12;
-            console.log(age);
-       
-            if (age > recommendedAgeInYears) {
-              categories.past.push(vaccine); // 已經過了施打疫苗期間
-            } else if (age + 1 < recommendedAgeInYears) {
-              categories.future.push(vaccine); // 未來超過一年的
-            } else {
-              categories.withinYear.push(vaccine); // 未來一年內要施打
-            }
-          }); */
-
           vaccines.forEach((vaccine) => {
             const { startMonths, endMonths } = parseVaccinationTime(
               vaccine.VaccinationTime
@@ -160,6 +143,91 @@ app.get("/dashboard", (req, res) => {
           });
 
           res.render("home", { categories });
+        });
+      }
+    );
+  } else {
+    res.redirect("/login");
+  }
+});*/
+
+app.get("/dashboard", (req, res) => {
+  // 檢查用戶是否已登錄
+  if (req.session.isAuthenticated) {
+    const identityCardNumber = req.session.identityCardNumber;
+    if (!identityCardNumber) {
+      return res.status(400).send("Identity Card Number is required");
+    }
+
+    connection.query(
+      "SELECT BirthDate FROM patients WHERE IdentityCardNumber = ?",
+      [identityCardNumber],
+      (err, result) => {
+        if (err) {
+          return res.status(500).send("Database Error");
+        }
+
+        if (result.length === 0) {
+          return res.status(404).send("Patient not found");
+        }
+
+        const birthDate = new Date(result[0].BirthDate);
+        const age = calculateage(birthDate);
+
+        // 先獲取所有疫苗信息
+        connection.query("SELECT * FROM Vaccine", (err, vaccines) => {
+          if (err) {
+            return res.status(500).send("Database Error");
+          }
+
+          // 查詢每種疫苗的測驗結果
+          const testResultsQuery =
+            "SELECT vaccine_name, passed FROM answer_records WHERE IdentityCardNumber = ?";
+          connection.query(
+            testResultsQuery,
+            [identityCardNumber],
+            (testErr, testResults) => {
+              if (testErr) {
+                return res.status(500).send("Error fetching test results");
+              }
+
+              // 建立一個映射，用於存儲測驗結果
+              const testResultsMap = new Map();
+              testResults.forEach((result) => {
+                testResultsMap.set(result.vaccine_name, result.passed);
+                console.log("Map set:", result.vaccine_name, result.passed);
+              });
+              console.log(testResultsMap);
+              const categories = {
+                past: [],
+                withinYear: [],
+                future: [],
+              };
+
+              vaccines.forEach((vaccine) => {
+                const { startMonths, endMonths } = parseVaccinationTime(
+                  vaccine.VaccinationTime
+                );
+                const startAgeInYears = startMonths / 12;
+                const endAgeInYears = endMonths / 12;
+
+                // 將測驗結果添加到對應的疫苗信息中
+                vaccine.testResult = testResultsMap.get(vaccine.vaccinename);
+                console.log(vaccine.vaccinename, vaccine.testResult);
+                console.log(vaccines);
+
+                if (age > endAgeInYears) {
+                  categories.past.push(vaccine);
+                } else if (age + 1 < startAgeInYears) {
+                  categories.future.push(vaccine);
+                } else {
+                  categories.withinYear.push(vaccine);
+                }
+              });
+
+              res.render("home", { categories });
+            }
+          );
         });
       }
     );
@@ -246,12 +314,125 @@ app.get("/vaccines", (req, res) => {
     }
   );
 });
+
 //登出
 app.get("/logout", (req, res) => {
   if (req.session) {
     delete req.session.verificationCode;
   }
   res.render("login");
+});
+
+app.get("/test/:vaccinename", (req, res) => {
+  const requestedVaccineName = req.params.vaccinename;
+  connection.query("SELECT * FROM tests", (error, results) => {
+    if (error) throw error;
+    res.render("tests", {
+      req: req,
+      test: results,
+      requestedVaccineName: requestedVaccineName,
+    });
+  });
+});
+
+app.post("/submit", (req, res) => {
+  const submittedVaccineName = req.body.vaccine_name;
+  let submittedAnswers = {};
+  const identityCardNumber = req.session.identityCardNumber;
+
+  if (!identityCardNumber) {
+    return res.status(401).send("Unauthorized: No Identity Card Number");
+  }
+
+  // 從req.body解析出提交的答案
+  for (let key in req.body) {
+    if (key !== "vaccine_name") {
+      const questionId = key.split("+")[0];
+      submittedAnswers[questionId] = req.body[key];
+    }
+  }
+
+  // 從資料庫中獲取正確答案
+  const query = "SELECT id, correct_option FROM tests WHERE vaccine_name = ?";
+  connection.query(query, [submittedVaccineName], (error, questions) => {
+    if (error) {
+      console.error("Error fetching questions:", error);
+      res.status(500).send("Error fetching questions");
+      return;
+    }
+
+    // 驗證答案
+    let isPassed = true;
+    const correctAnswers = {};
+    questions.forEach((question) => {
+      correctAnswers[question.id] = question.correct_option;
+      if (submittedAnswers[question.id] !== question.correct_option) {
+        isPassed = false;
+      }
+    });
+
+    // 檢查該疫苗的答案記錄是否已存在
+    const checkQuery =
+      "SELECT id FROM answer_records WHERE vaccine_name = ? AND IdentityCardNumber = ?";
+    connection.query(
+      checkQuery,
+      [submittedVaccineName, identityCardNumber],
+      (checkError, checkResults) => {
+        if (checkError) {
+          console.error("Error checking existing record:", checkError);
+          res.status(500).send("Error checking existing record");
+          return;
+        }
+
+        let updateQuery;
+        if (checkResults.length > 0) {
+          // 如果記錄已存在，更新該記錄
+          updateQuery =
+            "UPDATE answer_records SET selected_option = ?, passed = ? WHERE vaccine_name = ? AND IdentityCardNumber = ?";
+        } else {
+          // 如果記錄不存在，插入新記錄
+          updateQuery =
+            "INSERT INTO answer_records (selected_option, passed, vaccine_name, IdentityCardNumber) VALUES (?, ?, ?, ?)";
+        }
+
+        // 執行更新或插入操作
+        connection.query(
+          updateQuery,
+          [
+            JSON.stringify(submittedAnswers),
+            isPassed,
+            submittedVaccineName,
+            identityCardNumber,
+          ],
+          (insertError, insertResults) => {
+            if (insertError) {
+              console.error(
+                "Error inserting/updating answer record:",
+                insertError
+              );
+              res.status(500).send("Error inserting/updating answer record");
+            } else {
+              // 再次從資料庫中獲取所有問題並渲染頁面
+              connection.query("SELECT * FROM tests", (error, results) => {
+                if (error) {
+                  console.error("Error fetching questions:", error);
+                  res.status(500).send("Error fetching questions");
+                } else {
+                  res.render("tests", {
+                    test: results,
+                    requestedVaccineName: submittedVaccineName,
+                    isPassed: isPassed,
+                    correctAnswers: correctAnswers,
+                    submittedAnswers: submittedAnswers,
+                  });
+                }
+              });
+            }
+          }
+        );
+      }
+    );
+  });
 });
 
 function parseVaccinationTime(vaccinationTime) {
