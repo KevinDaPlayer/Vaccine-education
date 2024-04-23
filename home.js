@@ -458,19 +458,38 @@ function parseVaccinationTime(vaccinationTime) {
 }
 
 //
-function calculateAge(birthDate) {
-  var now = new Date();
-  var birth = new Date(birthDate);
-  var age = now.getFullYear() - birth.getFullYear();
-  var m = now.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
-    age--;
-  }
+// function calculateAge(birthDate) {
+//   var now = new Date();
+//   var birth = new Date(birthDate);
+//   var age = now.getFullYear() - birth.getFullYear();
+//   var m = now.getMonth() - birth.getMonth();
+//   if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
+//     age--;
+//   }
 
-  var d = now.getDate() - birth.getDate();
+//   var d = now.getDate() - birth.getDate();
+//   if (d < 0) {
+//     m--;
+//     d += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+//   }
+
+//   return age + " 年 " + m + " 個月 " + d + " 天";
+// }
+
+function calculateAge(birthDate) {
+  const now = new Date();
+  const birth = new Date(birthDate);
+  let age = now.getFullYear() - birth.getFullYear();
+  let m = now.getMonth() - birth.getMonth();
+  let d = now.getDate() - birth.getDate();
+
   if (d < 0) {
     m--;
-    d += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    d += new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(); // 获取上个月的总天数
+  }
+  if (m < 0) {
+    age--;
+    m += 12;
   }
 
   return age + " 年 " + m + " 個月 " + d + " 天";
