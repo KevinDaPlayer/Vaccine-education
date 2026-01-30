@@ -10,7 +10,7 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use("/static", express.static(path.join(__dirname, "node_modules")));
-// 創建數據庫連接
+
 const db = {
   host: "localhost",
 
@@ -29,8 +29,8 @@ app.use(
   session({
     secret: "MySecretKey",
     resave: false,
-    saveUninitialized: false, // 不要保存新的未初始化的會話
-    cookie: { secure: false }, // 對於HTTPS設置為true
+    saveUninitialized: false, 
+    cookie: { secure: false }, 
   })
 );
 
@@ -55,22 +55,22 @@ app.post("/login", (req, res) => {
       async (error, results, fields) => {
         if (error) {
           console.error(error);
-          return res.status(500).send("服务器错误。");
+          return res.status(500).send("伺服器錯誤。");
         }
 
         const user = results[0];
         if (!user) {
-          return res.send("用户不存在。");
+          return res.send("使用者不存在。");
         }
-        // 检查用户输入的密码是否与数据库中的密码匹配
+        // 
         if (password !== user.password) {
-          return res.send("密码不正确。");
+          return res.send("密碼錯誤。");
         }
 
-        // 将用户标记为已经登录
+        // 已登錄標籤
         req.session.isAuthenticated = true;
         req.session.identityCardNumber = user.IdentityCardNumber;
-        // 重定向到主画面
+        //重回主畫面
         res.redirect("/dashboard");
       }
     );
@@ -80,20 +80,16 @@ app.post("/login", (req, res) => {
   }
 });
 
-// 主画面路由
+
 /*app.get("/dashboard", (req, res) => {
-  // 检查用户是否已登录
   if (req.session.isAuthenticated) {
-    // 用户已登录，重定向到主画面
     res.render("home");
   } else {
-    // 用户未登录，重定向到登录页或其他处理
     res.render("home");
   }
 });*/
 
 /*app.get("/dashboard", (req, res) => {
-  // 檢查用戶是否已登錄
   if (req.session.isAuthenticated) {
     const identityCardNumber = req.session.identityCardNumber;
     if (!identityCardNumber) {
@@ -152,7 +148,6 @@ app.post("/login", (req, res) => {
 });*/
 
 app.get("/dashboard", (req, res) => {
-  // 檢查用戶是否已登錄
   if (req.session.isAuthenticated) {
     const identityCardNumber = req.session.identityCardNumber;
     if (!identityCardNumber) {
@@ -191,7 +186,7 @@ app.get("/dashboard", (req, res) => {
                 return res.status(500).send("Error fetching test results");
               }
 
-              // 建立一個映射，用於存儲測驗結果
+              // 建立一個map，用於儲測驗結果
               const testResultsMap = new Map();
               testResults.forEach((result) => {
                 testResultsMap.set(result.vaccine_name, result.passed);
@@ -256,7 +251,7 @@ app.get("/getAge", (req, res) => {
     }
 
     const birthDate = results[0].BirthDate;
-    const age = calculateAge(birthDate); // 假設您有一個函數來計算年齡
+    const age = calculateAge(birthDate); 
     res.json({ age });
   });
 });
@@ -281,7 +276,7 @@ app.get("/vaccines", (req, res) => {
       }
 
       const birthDate = new Date(result[0].BirthDate);
-      const age = calculateage(birthDate); // 年齡，以年為單位
+      const age = calculateage(birthDate); // 年齡以年為單位
 
       db.query("SELECT * FROM Vaccine", (err, vaccines) => {
         if (err) {
@@ -444,7 +439,7 @@ function parseVaccinationTime(vaccinationTime) {
 
   const matches = vaccinationTime.match(/(\d+)/g);
   if (matches && matches.length === 2) {
-    // 有兩個數字，表示是一個範圍，例如 "12到15個月"
+    // 有兩個數字，表示一個範圍
     const startMonths = parseInt(matches[0]);
     const endMonths = parseInt(matches[1]);
     return { startMonths, endMonths };
@@ -485,7 +480,7 @@ function calculateAge(birthDate) {
 
   if (d < 0) {
     m--;
-    d += new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(); // 获取上个月的总天数
+    d += new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate(); 
   }
   if (m < 0) {
     age--;
